@@ -7,8 +7,10 @@ import 'package:man_hinh/al_manhinh/manhinh3.dart';
 import 'package:man_hinh/al_manhinh/manhinh4.dart';
 import 'package:man_hinh/al_manhinh/manhinh5.dart';
 import 'package:man_hinh/al_manhinh/manhinh6.dart';
+import 'package:man_hinh/al_manhinh/manhinh7.dart';
 import 'package:man_hinh/al_manhinh/manhinh8.dart';
 import 'package:man_hinh/al_manhinh/manhinh10.dart';
+import 'package:man_hinh/al_manhinh/manhinh9.dart';
 
 class ManhinhFlutter extends StatefulWidget {
   const ManhinhFlutter({super.key});
@@ -24,17 +26,17 @@ class _ManhinhFlutterState extends State<ManhinhFlutter> {
       body: PageView(
         children: [
           Manhinh1(),
+          Manhinh2(),
+          Manhinh3(),
+          Manhinh4(),
+          Manhinh5(),
+          Manhinh6(),
+          Manhinh7(),
+          Manhinh8(),
+          Manhinh9(),
+          Manhinh10(),
           ManHinh11(),
           Manhinh12(),
-          Manhinh6(),
-          Manhinh5(),
-          Manhinh10(),
-          Manhinh3(),
-          Manhinh2(),
-          Manhinh4(),
-          // Manhinh9(),
-          Manhinh8(),
-          // Manhinh7(),
         ],
       ),
     );

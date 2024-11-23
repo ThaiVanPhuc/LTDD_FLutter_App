@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:man_hinh/al_manhinh/view.dart';
+import 'package:man_hinh/al_manhinh/manhinh1.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const ManhinhFlutter(),
+      home: const Manhinh1(),
     );
   }
 }

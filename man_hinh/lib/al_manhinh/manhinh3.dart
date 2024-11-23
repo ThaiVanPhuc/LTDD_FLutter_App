@@ -1,14 +1,51 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
 
-class Manhinh3 extends StatelessWidget {
-  final List<Tour> tours = [
-    Tour('Da Nang - Ba Na - Hoi An', 'Jan 30, 2020', 3, 400,
-        'assets/danang.png'),
-    Tour('Melbourne - Sydney', 'Jan 30, 2020', 3, 600, 'assets/halong.png'),
-    Tour('Hanoi - Ha Long Bay', 'Jan 30, 2020', 3, 300, 'assets/sydney.png'),
-    Tour('Da Nang - Ba Na - Hoi An', 'Jan 30, 2020', 3, 400,
-        'assets/danang.png'),
-  ];
+class Manhinh3 extends StatefulWidget {
+  @override
+  _Manhinh3State createState() => _Manhinh3State();
+}
+
+class _Manhinh3State extends State<Manhinh3> {
+  List<Tour> tours = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTours();
+  }
+
+  Future<void> fetchTours() async {
+    try {
+      final response = await http
+          .get(Uri.parse('https://ltdd-flutter-sever.onrender.com/api/trips'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          tours = data
+              .map((item) => Tour(
+                    title: item['tripName'],
+                    date: DateTime.parse(item['time']).toLocal().toString(),
+                    duration: item['days'],
+                    price: item['price'],
+                    imageUrl: item['avatar'],
+                  ))
+              .toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load tours');
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error fetching tours: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +53,23 @@ class Manhinh3 extends StatelessWidget {
       appBar: AppBar(
         title: Text('Tours in Danang'),
       ),
-      body: GridView.builder(
-        padding: EdgeInsets.all(10),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1, // Hiển thị 2 tour mỗi hàng
-          crossAxisSpacing: 5,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.5, // Tỉ lệ card
-        ),
-        itemCount: tours.length,
-        itemBuilder: (context, index) {
-          return TourCard(tour: tours[index]);
-        },
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : tours.isEmpty
+              ? Center(child: Text('No tours available'))
+              : GridView.builder(
+                  padding: EdgeInsets.all(10),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 1.5,
+                  ),
+                  itemCount: tours.length,
+                  itemBuilder: (context, index) {
+                    return TourCard(tour: tours[index]);
+                  },
+                ),
     );
   }
 }
@@ -40,7 +81,13 @@ class Tour {
   final int price;
   final String imageUrl;
 
-  Tour(this.title, this.date, this.duration, this.price, this.imageUrl);
+  Tour({
+    required this.title,
+    required this.date,
+    required this.duration,
+    required this.price,
+    required this.imageUrl,
+  });
 }
 
 class TourCard extends StatelessWidget {
@@ -65,11 +112,14 @@ class TourCard extends StatelessWidget {
                   topLeft: Radius.circular(15.0),
                   topRight: Radius.circular(15.0),
                 ),
-                child: Image.asset(
-                  tour.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: tour.imageUrl,
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
               Positioned(
@@ -117,7 +167,6 @@ class TourCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tiêu đề
                 Text(
                   tour.title,
                   style: TextStyle(
@@ -126,8 +175,6 @@ class TourCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 5),
-
-                // Ngày với biểu tượng icon
                 Row(
                   children: [
                     Icon(Icons.calendar_today, size: 16, color: Colors.grey),
@@ -136,8 +183,6 @@ class TourCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 5),
-
-                // Row để hiển thị số ngày và giá
                 Row(
                   children: [
                     Icon(Icons.timer, size: 16, color: Colors.grey),

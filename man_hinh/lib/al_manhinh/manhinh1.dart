@@ -1,7 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:man_hinh/al_manhinh/manhinh3.dart';
+import 'dart:convert';
 
-class Manhinh1 extends StatelessWidget {
+class Manhinh1 extends StatefulWidget {
   const Manhinh1({super.key});
+
+  @override
+  State<Manhinh1> createState() => _Manhinh1State();
+}
+
+class _Manhinh1State extends State<Manhinh1> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future<void> login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final url =
+        Uri.parse('https://ltdd-flutter-sever.onrender.com/api/users/login');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Manhinh3()),
+      );
+    } else {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        _errorMessage = data['message'] ?? 'Login failed';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +62,7 @@ class Manhinh1 extends StatelessWidget {
                   clipper: CustomClipPath(),
                   child: Container(
                     height: 200,
-                    color: Color(0xFF00C1A4),
+                    color: const Color(0xFF00C1A4),
                     padding: const EdgeInsets.symmetric(
                         vertical: 40, horizontal: 30),
                     child: Row(
@@ -30,7 +77,7 @@ class Manhinh1 extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Positioned(
                   top: 100,
                   right: 83,
@@ -48,65 +95,81 @@ class Manhinh1 extends StatelessWidget {
                 ),
               ],
             ),
-            // Phần nội dung đăng nhập
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: 20),
-                  Text("Sign In",
+                  const SizedBox(height: 20),
+                  const Text("Sign In",
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
-                  Text("Welcome back, Tuan Tran",
+                  const SizedBox(height: 10),
+                  const Text("Welcome back, Tuan Tran",
                       style: TextStyle(color: Color(0xFF00C1A4))),
-                  SizedBox(height: 15),
-                  Text("Email", style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextField(),
-                  SizedBox(height: 15),
-                  Text("Password",
+                  const SizedBox(height: 15),
+                  const Text("Email",
                       style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextField(obscureText: true),
-                  SizedBox(height: 15),
-                  Text("Forgot Password"),
-                  SizedBox(height: 30),
+                  TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 15),
+                  const Text("Password",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 15),
+                  if (_errorMessage != null)
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  const SizedBox(height: 15),
+                  const Text("Forgot Password"),
+                  const SizedBox(height: 30),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: _isLoading ? null : login,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        backgroundColor: Color(0xFF00C1A4),
+                        minimumSize: const Size(double.infinity, 50),
+                        backgroundColor: const Color(0xFF00C1A4),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
-                      child: Text(
-                        "SIGN IN",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "SIGN IN",
+                              style: TextStyle(color: Colors.white),
+                            ),
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Center(child: Text('Or sign in with')),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 30),
+                  const Center(child: Text('Or sign in with')),
+                  const SizedBox(height: 15),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset('images/iconFacebook.png', height: 40),
-                        SizedBox(width: 20),
+                        const SizedBox(width: 20),
                         Image.asset('images/iconKakao.png', height: 40),
-                        SizedBox(width: 20),
+                        const SizedBox(width: 20),
                         Image.asset('images/iconLine.png', height: 40),
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: const [
                         Text("Don't have an account? "),
                         Text("Sign Up",
                             style: TextStyle(color: Color(0xFF00C1A4))),
