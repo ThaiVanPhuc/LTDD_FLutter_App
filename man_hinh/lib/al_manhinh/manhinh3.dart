@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:man_hinh/al_manhinh/manhinh5.dart';
+import 'package:man_hinh/al_manhinh/manhinh6.dart';
+import 'package:man_hinh/al_manhinh/notifications_screen.dart';
 
 class Manhinh3 extends StatefulWidget {
   @override
@@ -9,6 +12,7 @@ class Manhinh3 extends StatefulWidget {
 }
 
 class _Manhinh3State extends State<Manhinh3> {
+  int _selectedIndex = 0;
   List<Tour> tours = [];
   bool isLoading = true;
 
@@ -47,6 +51,34 @@ class _Manhinh3State extends State<Manhinh3> {
     }
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Manhinh3()),
+      );
+    } else if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MessagesScreen()),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Notifications()),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +102,30 @@ class _Manhinh3State extends State<Manhinh3> {
                     return TourCard(tour: tours[index]);
                   },
                 ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Tours',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
@@ -204,6 +260,33 @@ class TourCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MessagesScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Manhinh5(),
+    );
+  }
+}
+
+class Notifications extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: NotificationsScreen(),
+    );
+  }
+}
+
+class ProfileScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Manhinh6(),
     );
   }
 }
