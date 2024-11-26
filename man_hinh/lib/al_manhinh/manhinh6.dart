@@ -18,6 +18,55 @@ class _Manhinh6State extends State<Manhinh6> {
   TextEditingController addressController = TextEditingController();
   TextEditingController countryController = TextEditingController();
 
+  String fullName = "Loading...";
+  String email = "Loading...";
+  String phoneNumber = "Loading...";
+  String address = "Loading...";
+  String country = "Loading...";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    final url = Uri.parse('https://ltdd-flutter-sever.onrender.com/api/users');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Handle if API returns a list of users
+        if (data is List && data.isNotEmpty) {
+          setState(() {
+            fullName = data[0]['full_name'] ?? "N/A";
+            email = data[0]['email'] ?? "N/A";
+            phoneNumber = data[0]['phone_number'] ?? "N/A";
+            address = data[0]['address'] ?? "N/A";
+            country = data[0]['country'] ?? "N/A";
+
+            fullNameController.text = fullName;
+            emailController.text = email;
+            phoneController.text = phoneNumber;
+            addressController.text = address;
+            countryController.text = country;
+          });
+        }
+      } else {
+        setState(() {
+          fullName = "Error loading name";
+          email = "Error loading email";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        fullName = "Failed to fetch data";
+        email = "Failed to fetch data";
+      });
+    }
+  }
+
   Future<void> _signOut() async {
     Navigator.pushAndRemoveUntil(
       context,
@@ -27,8 +76,7 @@ class _Manhinh6State extends State<Manhinh6> {
   }
 
   Future<void> _editProfile() async {
-    const String apiUrl =
-        'https://ltdd-flutter-sever.onrender.com/api/users/update/<user_id>';
+    const String apiUrl = 'https://ltdd-flutter-sever.onrender.com/api/users';
     final response = await http.put(
       Uri.parse(apiUrl),
       headers: {"Content-Type": "application/json"},
@@ -111,14 +159,14 @@ class _Manhinh6State extends State<Manhinh6> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tuan Tran',
+                      fullName,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    Text('Guide', style: TextStyle(color: Colors.white70)),
+                    Text(email, style: TextStyle(color: Colors.white70)),
                   ],
                 ),
                 Spacer(),
@@ -127,11 +175,11 @@ class _Manhinh6State extends State<Manhinh6> {
                     setState(() {
                       _isEditingProfile = true;
 
-                      fullNameController.text = "Tuan Tran";
-                      emailController.text = "email@example.com";
-                      phoneController.text = "123456789";
-                      addressController.text = "123 Street";
-                      countryController.text = "Vietnam";
+                      fullNameController.text = fullName;
+                      emailController.text = email;
+                      phoneController.text = phoneNumber;
+                      addressController.text = address;
+                      countryController.text = country;
                     });
                   },
                   child: Text('EDIT PROFILE'),
