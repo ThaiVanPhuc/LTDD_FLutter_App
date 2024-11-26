@@ -105,7 +105,7 @@ class _Manhinh1State extends State<Manhinh1> {
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  const Text("Welcome back, Tuan Tran",
+                  const Text("Welcome back!",
                       style: TextStyle(color: Color(0xFF00C1A4))),
                   const SizedBox(height: 15),
                   const Text("Email",
