@@ -36,8 +36,6 @@ class _Manhinh6State extends State<Manhinh6> {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
-        // Handle if API returns a list of users
         if (data is List && data.isNotEmpty) {
           setState(() {
             fullName = data[0]['full_name'] ?? "N/A";
@@ -76,29 +74,42 @@ class _Manhinh6State extends State<Manhinh6> {
   }
 
   Future<void> _editProfile() async {
-    const String apiUrl = 'https://ltdd-flutter-sever.onrender.com/api/users';
-    final response = await http.put(
-      Uri.parse(apiUrl),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "full_name": fullNameController.text,
-        "email": emailController.text,
-        "phone_number": phoneController.text,
-        "address": addressController.text,
-        "country": countryController.text,
-      }),
-    );
+    const String userId = "673c49ecf873a236f0cdfdb9";
+    final String apiUrl =
+        'https://ltdd-flutter-sever.onrender.com/api/users/update/$userId';
 
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Profile updated successfully")),
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "id": "100662",
+          "full_name": fullNameController.text,
+          "email": emailController.text,
+          "phone_number": phoneController.text,
+          "address": addressController.text,
+          "country": countryController.text,
+        }),
       );
-      setState(() {
-        _isEditingProfile = false;
-      });
-    } else {
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Profile updated successfully")),
+        );
+        setState(() {
+          _isEditingProfile = false;
+          fetchUserData();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text("Failed to update profile: ${response.statusCode}")),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to update profile")),
+        SnackBar(content: Text("Error: $e")),
       );
     }
   }
@@ -120,17 +131,6 @@ class _Manhinh6State extends State<Manhinh6> {
             }
           },
         ),
-        actions: _isEditingProfile
-            ? [
-                TextButton(
-                  onPressed: _editProfile,
-                  child: Text(
-                    'SAVE',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ]
-            : null,
       ),
       body: _isEditingProfile ? _buildEditProfile() : _buildSettings(),
     );
@@ -272,6 +272,15 @@ class _Manhinh6State extends State<Manhinh6> {
           TextFormField(
             controller: countryController,
             decoration: InputDecoration(labelText: "Country"),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _editProfile,
+            child: Text("SAVE"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
           ),
         ],
       ),
